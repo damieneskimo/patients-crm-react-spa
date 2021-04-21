@@ -1,7 +1,7 @@
 import { apiClient } from '../api.js'
 import Modal from 'react-modal';
 import Timeline from './Timeline'
-import Patient from './Patient'
+import Loader from './Loader'
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
@@ -25,10 +25,6 @@ export default function Notes(props) {
                         }
                     }).catch(error => {
                         console.error(error);
-                        // if there is error retrieving patient, then it's not authenticated
-                        if (error.response.status === 401) {
-                            // $router.push('/')
-                        }
                     });
             });
     }, [])
@@ -47,6 +43,10 @@ export default function Notes(props) {
                     console.error(error);
                 });
             });
+    }
+
+    if (isLoading) {
+        return <Loader />
     }
 
     return (

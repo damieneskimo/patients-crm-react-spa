@@ -2,6 +2,7 @@ import Patient from './Patient'
 import { apiClient } from '../api.js'
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
+import Loader from './Loader';
 
 export default function PatientsList(props) {
 
@@ -16,8 +17,7 @@ export default function PatientsList(props) {
           .then(response => {
             if (response.status === 200) {
               setPatients(response.data);
-              // setLoadingStatus(false);
-              
+              setLoadingStatus(false);
             }
           })
           .catch(error => console.error(error));
@@ -46,6 +46,10 @@ export default function PatientsList(props) {
                   console.error(error);
               });
           });
+    }
+
+    if (isLoading) {
+      return <Loader />
     }
 
     return (
