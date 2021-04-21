@@ -2,8 +2,6 @@ import Patient from './Patient'
 import { apiClient } from '../api.js'
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-// import { Switch, Route, useRouteMatch } from 'react-router-dom'
-import Notes from './Notes'
 
 export default function PatientsList(props) {
 
@@ -14,26 +12,20 @@ export default function PatientsList(props) {
     const [ isLoading, setLoadingStatus ] = useState(true);
 
     useEffect(() => {
-      // if (patients.length == 0) {
         apiClient.get('/api/patients')
           .then(response => {
             if (response.status === 200) {
               setPatients(response.data);
               // setLoadingStatus(false);
               
-              // debugger
             }
           })
           .catch(error => console.error(error));
-      // }
     }, [])
-
-    // let { path, url } = useRouteMatch();
 
     const filteredPatients = () => {
         return patients.filter(patient => {
           let haystack = patient.name.toLowerCase();
-
           return haystack.includes(keywords.toLowerCase())
         })
     }
@@ -76,7 +68,7 @@ export default function PatientsList(props) {
             </tr>
           </thead>
           <tbody className="text-left">
-            {patients.map(function(patient){
+            {filteredPatients().map(function(patient){
               return <Patient key={patient.id} data={patient} />
             })}
           </tbody>
