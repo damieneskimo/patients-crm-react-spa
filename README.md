@@ -1,6 +1,10 @@
-# Getting Started with Create React App
+# Patient CRM (Vue SPA)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a React Single Page Application (SPA) for managing patients data was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). It will retrieve the data from API in the project: https://github.com/damieneskimo/patients-crm. <br />
+
+It uses Axios as the http client, React Router for the routing and Tailwind CSS for styling. <br />
+
+> Note: If you are using a different domain and port for the backend, please change it accordingly in api.js file
 
 ## Available Scripts
 
