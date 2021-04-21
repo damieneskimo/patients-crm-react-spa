@@ -102,7 +102,7 @@ export default function PatientsList(props) {
                   />
               </div>
               <div className="my-5">
-                <select onChange={(e) => setPatientAttribute('gender', e.target.value)} className="w-full border-2 rounded p-3 border-green-500">
+                <select onChange={(e) => setPatientAttribute('gender', e.target.value)} value="" className="w-full border-2 rounded p-3 border-green-500">
                   <option disabled value="">Please select a gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
