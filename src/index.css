@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+a:focus {
+    outline: none;
+}
+
+/* Pagination */
+.pagination li {
+    margin: 0 1rem;
+}
+
 /* Loader component css */
 .lds-container {
     text-align: center;

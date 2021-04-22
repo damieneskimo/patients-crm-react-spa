@@ -3,9 +3,10 @@ import { apiClient } from '../api.js'
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import Loader from './Loader';
+import ReactPaginate from 'react-paginate';
 
 export default function PatientsList(props) {
-
+    const [ pageCount, setPageCount] = useState(1);
     const [ patients, setPatients ] = useState([]);
     const [ keywords, setKeywords ] = useState('');
     const [ patient, setPatient ] = useState({});
@@ -17,6 +18,7 @@ export default function PatientsList(props) {
           .then(response => {
             if (response.status === 200) {
               setPatients(response.data.data);
+              setPageCount(response.data.meta.last_page)
               setLoadingStatus(false);
             }
           })
@@ -44,6 +46,15 @@ export default function PatientsList(props) {
                   console.error(error);
               });
           });
+    }
+
+    const handlePageClick = (data) => {
+      let selected = data.selected;
+      // let offset = Math.ceil(selected * this.props.perPage);
+  
+      // this.setState({ offset: offset }, () => {
+      //   this.loadCommentsFromServer();
+      // });
     }
 
     if (isLoading) {
@@ -75,6 +86,20 @@ export default function PatientsList(props) {
             })}
           </tbody>
         </table>
+        
+        {/* Pagination */}
+        <ReactPaginate
+              previousLabel={'prev'}
+              nextLabel={'next'}
+              breakLabel={'...'}
+              breakClassName={'break-me'}
+              pageCount={pageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={handlePageClick}
+              containerClassName={'pagination my-5 flex justify-center text-2xl'}
+              activeClassName={'bg-green-400 rounded-full h-8 w-8 text-center'}
+            />
 
         <Modal 
           isOpen={showModal}
