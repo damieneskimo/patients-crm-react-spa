@@ -2,7 +2,6 @@ import { apiClient } from '../api.js';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
-import Notes from './Notes';
 import { useRouteMatch } from 'react-router-dom';
 
 export default function Patient (props) {

@@ -16,7 +16,7 @@ export default function PatientsList(props) {
         apiClient.get('/api/patients')
           .then(response => {
             if (response.status === 200) {
-              setPatients(response.data);
+              setPatients(response.data.data);
               setLoadingStatus(false);
             }
           })
@@ -30,10 +30,6 @@ export default function PatientsList(props) {
         })
     }
 
-    const setPatientAttribute = (attribute, value) => {
-      patient[attribute] = value;
-    }
-
     const addNewPatient = () => {
         apiClient.get('/sanctum/csrf-cookie')
           .then(() => {
@@ -41,6 +37,8 @@ export default function PatientsList(props) {
                 if (response.status === 201) {
                   patients.unshift(response.data);
                   setModalStatus(false);
+                  // reset patient state
+                  setPatient({})
                 }
               }).catch(error => {
                   console.error(error);
@@ -91,7 +89,8 @@ export default function PatientsList(props) {
                   className="w-full border-2 rounded p-3 border-green-500"
                   name="name"
                   placeholder="Name"
-                  onChange={(e) => setPatientAttribute('name', e.target.value)}
+                  onChange={(e) => setPatient({...patient, name: e.target.value})}
+                  value={patient.name}
                   required
                   />
               </div>
@@ -101,12 +100,13 @@ export default function PatientsList(props) {
                   type="email"
                   name="email"
                   placeholder="Email"
-                  onChange={(e) => setPatientAttribute('email', e.target.value)}
+                  onChange={(e) => setPatient({...patient, email: e.target.value})}
+                  value={patient.email}
                   required
                   />
               </div>
               <div className="my-5">
-                <select onChange={(e) => setPatientAttribute('gender', e.target.value)} value="" className="w-full border-2 rounded p-3 border-green-500">
+                <select onChange={(e) => setPatient({...patient, gender: e.target.value})} value={patient.gender?? ''} className="w-full border-2 rounded p-3 border-green-500">
                   <option disabled value="">Please select a gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -118,7 +118,8 @@ export default function PatientsList(props) {
                     className="w-full border-2 rounded p-3 border-green-500"
                     name="mobile"
                     placeholder="Mobile"
-                    onChange={(e) => setPatientAttribute('mobile', e.target.value)}
+                    onChange={(e) => setPatient({...patient, mobile: e.target.value})}
+                    value={patient.mobile}
                 />
               </div>
             </form>
