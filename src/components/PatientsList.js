@@ -91,6 +91,7 @@ export default function PatientsList(props) {
                   placeholder="Name"
                   onChange={(e) => setPatient({...patient, name: e.target.value})}
                   value={patient.name}
+                  autoFocus
                   required
                   />
               </div>

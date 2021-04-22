@@ -7,7 +7,8 @@ import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
 export default function Notes(props) {
-    const [patient, setPatient] = useState({});
+    const [notes, setNotes] = useState([]);
+    const [patientName, setPatientName] = useState('');
     const [showModal, setModalStatus] = useState(false);
     const [content, setContent] = useState('');
     const [isLoading, setLoadingStatus] = useState(true);
@@ -17,10 +18,11 @@ export default function Notes(props) {
     useEffect(() => {
         apiClient.get('/sanctum/csrf-cookie')
             .then(() => {
-                apiClient.get('/api/patients/' + patientId)
+                apiClient.get('/api/patients/' + patientId + '/notes')
                     .then(response => {
                         if (response.status == 200) {
-                            setPatient(response.data);
+                            setNotes(response.data.data);
+                            setPatientName(response.data.patient_name);
                             setLoadingStatus(false);
                         }
                     }).catch(error => {
@@ -32,12 +34,13 @@ export default function Notes(props) {
     const addNote = () => {
         apiClient.get('/sanctum/csrf-cookie')
             .then(() => {
-                apiClient.post('/api/patients/' + patient.id + '/notes', {
+                apiClient.post('/api/patients/' + patientId + '/notes', {
                     content: content,
                 }).then(response => {
                     if (response.status == 201) {
-                        patient.notes.unshift(response.data);
+                        notes.unshift(response.data);
                         setModalStatus(false);
+                        setContent('');
                     }
                 }).catch(error => {
                     console.error(error);
@@ -54,17 +57,17 @@ export default function Notes(props) {
             <h1 className="text-2xl text-left">
                 Notes for
                 <Link to='/patients' className="text-green-500">
-                     { ' ' + patient.name }
+                     { ' ' + patientName }
                 </Link>
             </h1>
             <button onClick={() => setModalStatus(true)} className="py-2 px-4 rounded bg-green-500 text-lg mt-3 float-left">Add New Note</button>
 
             <div className="clear-both mt-20">
-                {! isLoading && patient.notes.length > 0 &&
-                    <Timeline data={patient.notes} />
+                {! isLoading && notes.length > 0 &&
+                    <Timeline data={notes} />
                 }
-                {! isLoading && patient.notes.length === 0 &&
-                    <p>No notes found for { patient.name }</p>
+                {! isLoading && notes.length === 0 &&
+                    <p>No notes found for { patientName }</p>
                 }
             </div>
 
@@ -74,7 +77,7 @@ export default function Notes(props) {
                 className="text-left z-50 overflow-auto bg-white w-1/2 px-10 py-5 inset-1/4 border-green-200 border-2 absolute"
                 contentLabel="Add New Note Modal"
             >
-                <h3 className="text-xl">Add New Note for { patient.name }</h3>
+                <h3 className="text-xl">Add New Note for { patientName }</h3>
                 <form>
                     <div className="my-5">
                         <textarea 
@@ -83,6 +86,8 @@ export default function Notes(props) {
                             rows="4"
                             placeholder="Please enter the content"
                             onChange={(e) => setContent(e.target.value)}
+                            value={content}
+                            autoFocus
                             required>
                         </textarea>
                     </div>
