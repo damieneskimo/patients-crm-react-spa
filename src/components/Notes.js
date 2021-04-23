@@ -22,7 +22,7 @@ export default function Notes(props) {
                     .then(response => {
                         if (response.status == 200) {
                             setNotes(response.data.data);
-                            setPatientName(response.data.patient_name);
+                            setPatientName(response.data.meta.patient_name);
                             setLoadingStatus(false);
                         }
                     }).catch(error => {

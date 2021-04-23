@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-a:focus {
+a:focus,
+.ReactModal__Content:focus {
     outline: none;
 }
 

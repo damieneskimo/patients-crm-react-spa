@@ -12,18 +12,35 @@ export default function PatientsList(props) {
     const [ patient, setPatient ] = useState({});
     const [ showModal, setModalStatus ] = useState();
     const [ isLoading, setLoadingStatus ] = useState(true);
+    const [ initialPage, setInitialpage] = useState(0);
 
     useEffect(() => {
-        apiClient.get('/api/patients')
+      const queryString = window.location.search;
+      const url = new URL(window.location);
+      const page = parseInt(url.searchParams.get('page'));
+
+      if (page !== undefined && page !== 0) {
+        setInitialpage(page - 1)
+      }
+
+      getPatients(queryString, (data) => {
+        setPageCount(data.meta.last_page);
+      })
+    }, [])
+
+    const getPatients = (queryString = '', callback = false) => {
+      apiClient.get('/api/patients' + queryString)
           .then(response => {
             if (response.status === 200) {
               setPatients(response.data.data);
-              setPageCount(response.data.meta.last_page)
+              if (callback !== false) {
+                callback(response.data)
+              }
               setLoadingStatus(false);
             }
           })
           .catch(error => console.error(error));
-    }, [])
+    }
 
     const filteredPatients = () => {
         return patients.filter(patient => {
@@ -49,12 +66,13 @@ export default function PatientsList(props) {
     }
 
     const handlePageClick = (data) => {
-      let selected = data.selected;
-      // let offset = Math.ceil(selected * this.props.perPage);
-  
-      // this.setState({ offset: offset }, () => {
-      //   this.loadCommentsFromServer();
-      // });
+      let pageNum = parseInt(data.selected) + 1;
+      const url = new URL(window.location);
+
+      getPatients('?page=' + pageNum, (res) => {
+        url.searchParams.set('page', pageNum);
+        window.history.pushState({}, '', url);
+      })
     }
 
     if (isLoading) {
@@ -89,17 +107,19 @@ export default function PatientsList(props) {
         
         {/* Pagination */}
         <ReactPaginate
-              previousLabel={'prev'}
-              nextLabel={'next'}
-              breakLabel={'...'}
-              breakClassName={'break-me'}
-              pageCount={pageCount}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageClick}
-              containerClassName={'pagination my-5 flex justify-center text-2xl'}
-              activeClassName={'bg-green-400 rounded-full h-8 w-8 text-center'}
-            />
+          previousLabel={'prev'}
+          nextLabel={'next'}
+          breakLabel={'...'}
+          breakClassName={'break-me'}
+          pageCount={pageCount}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          initialPage={initialPage}
+          disableInitialCallback={true}
+          onPageChange={handlePageClick}
+          containerClassName={'pagination my-5 flex justify-center text-2xl'}
+          activeClassName={'bg-green-400 rounded-full h-8 w-8 text-center'}
+        />
 
         <Modal 
           isOpen={showModal}

@@ -5,16 +5,12 @@ import Modal from 'react-modal';
 import { useRouteMatch } from 'react-router-dom';
 
 export default function Patient (props) {
-    const [ patient, setPatient ] = useState(props.data);
+    const [ patient, setPatient ] = useState({...props.data, isEditing: false});
 
     const [ name, setName ] = useState(patient.name);
     const [ gender, setGender ] = useState(patient.gender);
     const [ mobile, setMobile ] = useState(patient.mobile);
     const [ email, setEmail ] = useState(patient.email);
-
-    useEffect(() => {
-      patient.isEditing = false;
-    },[])
 
     let { path, url } = useRouteMatch();
   
