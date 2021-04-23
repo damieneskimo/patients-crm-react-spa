@@ -6,6 +6,13 @@ It uses Axios as the http client, React Router for the routing and Tailwind CSS 
 
 > Note: If you are using a different domain and port for the backend, please change it accordingly in api.js file
 
+<br />
+
+# Todos:
+
+- [ ] add api request for searching keywords on Patiets List
+- [ ] add unit test
+
 ## Available Scripts
 
 In the project directory, you can run:
