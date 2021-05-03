@@ -4,57 +4,22 @@ import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import Loader from './Loader';
 import ReactPaginate from 'react-paginate';
+import useFetchDataListApi from '../hooks/useFetchDataListApi';
 
 export default function PatientsList(props) {
-    const [ pageCount, setPageCount] = useState(1);
-    const [ patients, setPatients ] = useState([]);
-    const [ keywords, setKeywords ] = useState('');
     const [ patient, setPatient ] = useState({});
     const [ showModal, setModalStatus ] = useState();
-    const [ isLoading, setLoadingStatus ] = useState(true);
-    const [ initialPage, setInitialpage] = useState(0);
-
-    useEffect(() => {
-      const queryString = window.location.search;
-      const url = new URL(window.location);
-      const page = parseInt(url.searchParams.get('page'));
-
-      if (page !== undefined && page !== 0) {
-        setInitialpage(page - 1)
-      }
-
-      getPatients(queryString, (data) => {
-        setPageCount(data.meta.last_page);
-      })
-    }, [])
-
-    const getPatients = (queryString = '', callback = false) => {
-      apiClient.get('/api/patients' + queryString)
-          .then(response => {
-            if (response.status === 200) {
-              setPatients(response.data.data);
-              if (callback !== false) {
-                callback(response.data)
-              }
-              setLoadingStatus(false);
-            }
-          })
-          .catch(error => console.error(error));
-    }
-
-    const filteredPatients = () => {
-        return patients.filter(patient => {
-          let haystack = patient.name.toLowerCase();
-          return haystack.includes(keywords.toLowerCase())
-        })
-    }
+    const [
+      { pageCount, currentPage, dataList, keywords, isLoading, isError }, 
+      setKeywords, setCurrentPage
+    ] = useFetchDataListApi('/api/patients' + window.location.search);
 
     const addNewPatient = () => {
         apiClient.get('/sanctum/csrf-cookie')
           .then(() => {
               apiClient.post('/api/patients/', patient).then(response => {
                 if (response.status === 201) {
-                  patients.unshift(response.data);
+                  dataList.unshift(response.data);
                   setModalStatus(false);
                   // reset patient state
                   setPatient({})
@@ -69,10 +34,9 @@ export default function PatientsList(props) {
       let pageNum = parseInt(data.selected) + 1;
       const url = new URL(window.location);
 
-      getPatients('?page=' + pageNum, (res) => {
-        url.searchParams.set('page', pageNum);
-        window.history.pushState({}, '', url);
-      })
+      setCurrentPage(pageNum);
+      url.searchParams.set('page', pageNum);
+      window.history.pushState({}, '', url);
     }
 
     if (isLoading) {
@@ -99,7 +63,7 @@ export default function PatientsList(props) {
             </tr>
           </thead>
           <tbody className="text-left">
-            {filteredPatients().map(function(patient){
+            {dataList.map(function(patient){
               return <Patient key={patient.id} data={patient} />
             })}
           </tbody>
@@ -114,7 +78,7 @@ export default function PatientsList(props) {
           pageCount={pageCount}
           marginPagesDisplayed={2}
           pageRangeDisplayed={5}
-          initialPage={initialPage}
+          initialPage={currentPage - 1}
           disableInitialCallback={true}
           onPageChange={handlePageClick}
           containerClassName={'pagination my-5 flex justify-center text-2xl'}
