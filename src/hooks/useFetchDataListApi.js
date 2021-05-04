@@ -8,26 +8,40 @@ const useFetchDataListApi = (apiEndpoint) => {
     const [ keywords, setKeywords ] = useState('');
     const [ isLoading, setIsLoading ] = useState(true);
     const [ isError, setIsError ] = useState(false);
-   
-    useEffect(() => {
-      const url = new URL(window.location);
-      const page = parseInt(url.searchParams.get('page'));
 
-      if (page !== undefined && page !== 0) {
+    useEffect(() => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const page = parseInt(searchParams.get('page'));
+      const keywordsQuery = searchParams.get('keywords')
+
+      if (keywordsQuery) {
+        setKeywords(keywordsQuery)
+      }
+      if (page !== undefined && page !== 1) {
         setCurrentPage(page)
       }
+    }, [])
+
+    useEffect(() => {
+      const params = {};
+      if (keywords.length) {
+        params.keywords = keywords;
+      }
+      if (currentPage > 1) {
+        params.page = currentPage;
+      }
+      const queryString = new URLSearchParams(params).toString();
 
       const fetchData = async () => {
         setIsError(false);
         setIsLoading(true);
-   
-        try {
-          const result = await apiClient.get(apiEndpoint)
 
-          console.log(result)
+        try {
+          const result = await apiClient.get(apiEndpoint + (queryString? `?${queryString}` : ''))
+
           if (result.status === 200) {
             setDataList(result.data.data);
-            setPageCount(result.data.meta.last_page);  
+            setPageCount(result.data.meta.last_page);
           }
         } catch (error) {
           setIsError(true);
