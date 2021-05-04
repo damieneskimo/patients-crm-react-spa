@@ -1,10 +1,11 @@
 import Patient from './Patient'
 import { apiClient } from '../api.js'
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Modal from 'react-modal';
 import Loader from './Loader';
 import ReactPaginate from 'react-paginate';
 import useFetchDataListApi from '../hooks/useFetchDataListApi';
+import { useDebouncedCallback } from 'use-debounce';
 
 export default function PatientsList(props) {
     const [ patient, setPatient ] = useState({});
@@ -12,7 +13,23 @@ export default function PatientsList(props) {
     const [
       { pageCount, currentPage, dataList, keywords, isLoading, isError }, 
       setKeywords, setCurrentPage
-    ] = useFetchDataListApi('/api/patients' + window.location.search);
+    ] = useFetchDataListApi('/api/patients');
+
+    const debounced = useDebouncedCallback(
+      (value) => {
+        setKeywords(value);
+        setCurrentPage(1);
+
+        // update url query string
+        const url = new URL(window.location);
+        url.searchParams.delete('page');
+        if (keywords.length) {
+          url.searchParams.set('keywords', value);
+        }
+        window.history.pushState({}, '', url);
+      },
+      800
+    );
 
     const addNewPatient = () => {
         apiClient.get('/sanctum/csrf-cookie')
@@ -47,8 +64,9 @@ export default function PatientsList(props) {
       <div>
         <div className="text-left mt-5">
           <button onClick={() => setModalStatus(true)} className="py-2 px-4 rounded bg-green-500 text-lg mr-3">Add New Patient</button>
-          <input onChange={(e) => setKeywords(e.target.value)}
-              placeholder="Search by name"
+          <input onChange={ (e) => debounced(e.target.value) }
+              defaultValue={keywords}
+              placeholder="Search by name or email"
               className="border-2 border-green-500 rounded w-1/4 py-2 px-4" />
         </div>
 

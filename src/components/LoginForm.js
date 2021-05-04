@@ -7,7 +7,6 @@ export default function LoginForm (props) {
     const [authError, setAuthError] = useState(false);
     const [unknownError, setUnknownError] = useState(false);
     const [forbiddenError, setForbiddenError] = useState(false);
-    console.log(props)
     const handleSubmit = (e) => {
         e.preventDefault();
 
