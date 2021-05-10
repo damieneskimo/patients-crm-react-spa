@@ -1,19 +1,22 @@
-import Patient from './Patient'
-import { apiClient } from '../api.js'
+import PatientListItem from './PatientListItem'
+import { apiClient } from '../api';
 import { useState } from 'react';
 import Modal from 'react-modal';
 import Loader from './Loader';
 import ReactPaginate from 'react-paginate';
-import useFetchDataListApi from '../hooks/useFetchDataListApi';
+import { useFetchDataListApi } from '../hooks/useFetchDataListApi';
 import { useDebouncedCallback } from 'use-debounce';
+import { Patient } from '../types';
 
-export default function PatientsList(props) {
-    const [ patient, setPatient ] = useState({});
-    const [ showModal, setModalStatus ] = useState();
+export default function PatientsList() {
+    const [ newPatient, setNewPatient ] = useState({
+      name: '', email: '', gender: '', mobile: ''
+    });
+    const [ showModal, setModalStatus ] = useState(false);
     const [
       { pageCount, currentPage, dataList, keywords, isLoading, isError }, 
       setKeywords, setCurrentPage
-    ] = useFetchDataListApi('/api/patients');
+    ] = useFetchDataListApi<Patient>('/api/patients');
 
     const debounced = useDebouncedCallback(
       (value) => {
@@ -21,12 +24,12 @@ export default function PatientsList(props) {
         setCurrentPage(1);
 
         // update url query string
-        const url = new URL(window.location);
+        const url = new URL(window.location.href);
         url.searchParams.delete('page');
         if (keywords.length) {
           url.searchParams.set('keywords', value);
         }
-        window.history.pushState({}, '', url);
+        window.history.pushState({}, '', url.toString());
       },
       800
     );
@@ -34,12 +37,14 @@ export default function PatientsList(props) {
     const addNewPatient = () => {
         apiClient.get('/sanctum/csrf-cookie')
           .then(() => {
-              apiClient.post('/api/patients/', patient).then(response => {
+              apiClient.post('/api/patients/', newPatient).then(response => {
                 if (response.status === 201) {
                   dataList.unshift(response.data);
                   setModalStatus(false);
                   // reset patient state
-                  setPatient({})
+                  setNewPatient({
+                    name: '', email: '', gender: '', mobile: ''
+                  })
                 }
               }).catch(error => {
                   console.error(error);
@@ -47,13 +52,13 @@ export default function PatientsList(props) {
           });
     }
 
-    const handlePageClick = (data) => {
-      let pageNum = parseInt(data.selected) + 1;
-      const url = new URL(window.location);
+    const handlePageClick = (selectedItem: {selected: number}) => {
+      let pageNum = selectedItem.selected + 1;
+      const url = new URL(window.location.href);
 
       setCurrentPage(pageNum);
-      url.searchParams.set('page', pageNum);
-      window.history.pushState({}, '', url);
+      url.searchParams.set('page', pageNum.toString());
+      window.history.pushState({}, '', url.toString());
     }
 
     if (isLoading) {
@@ -81,8 +86,8 @@ export default function PatientsList(props) {
             </tr>
           </thead>
           <tbody className="text-left">
-            {dataList.map(function(patient){
-              return <Patient key={patient.id} data={patient} />
+            {dataList.map(function(patient: Patient){
+              return <PatientListItem key={patient.id} data={patient} />
             })}
           </tbody>
         </table>
@@ -116,8 +121,8 @@ export default function PatientsList(props) {
                   className="w-full border-2 rounded p-3 border-green-500"
                   name="name"
                   placeholder="Name"
-                  onChange={(e) => setPatient({...patient, name: e.target.value})}
-                  value={patient.name}
+                  onChange={(e) => setNewPatient({...newPatient, name: e.target.value}) }
+                  value={newPatient.name}
                   autoFocus
                   required
                   />
@@ -128,13 +133,13 @@ export default function PatientsList(props) {
                   type="email"
                   name="email"
                   placeholder="Email"
-                  onChange={(e) => setPatient({...patient, email: e.target.value})}
-                  value={patient.email}
+                  onChange={(e) => setNewPatient({...newPatient, email: e.target.value})}
+                  value={newPatient.email}
                   required
                   />
               </div>
               <div className="my-5">
-                <select onChange={(e) => setPatient({...patient, gender: e.target.value})} value={patient.gender?? ''} className="w-full border-2 rounded p-3 border-green-500">
+                <select onChange={(e) => setNewPatient({...newPatient, gender: e.target.value})} value={newPatient.gender?? ''} className="w-full border-2 rounded p-3 border-green-500">
                   <option disabled value="">Please select a gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -146,8 +151,8 @@ export default function PatientsList(props) {
                     className="w-full border-2 rounded p-3 border-green-500"
                     name="mobile"
                     placeholder="Mobile"
-                    onChange={(e) => setPatient({...patient, mobile: e.target.value})}
-                    value={patient.mobile}
+                    onChange={(e) => setNewPatient({...newPatient, mobile: e.target.value})}
+                    value={newPatient.mobile}
                 />
               </div>
             </form>

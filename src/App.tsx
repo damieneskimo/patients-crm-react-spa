@@ -8,7 +8,7 @@ import {
   Switch
 } from "react-router-dom";
 import { useState } from 'react';
-import { apiClient } from './api.js'
+import { apiClient } from './api';
 import Modal from 'react-modal';
 import Layout from './components/Layout';
 

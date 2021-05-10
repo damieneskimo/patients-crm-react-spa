@@ -1,36 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { apiClient } from '../api.js'
+import { useState, useEffect } from 'react';
+import { apiClient } from '../api'
 
-const useFetchDataListApi = (apiEndpoint) => {
+export function useFetchDataListApi<T>(apiEndpoint: string) {
     const [ pageCount, setPageCount ] = useState(1);
     const [ currentPage, setCurrentPage ] = useState(1);
-    const [ dataList, setDataList ] = useState([]);
+    const [ dataList, setDataList ] = useState<T[]>([]);
     const [ keywords, setKeywords ] = useState('');
     const [ isLoading, setIsLoading ] = useState(true);
     const [ isError, setIsError ] = useState(false);
 
     useEffect(() => {
       const searchParams = new URLSearchParams(window.location.search);
-      const page = parseInt(searchParams.get('page'));
+      const page = searchParams.get('page');
       const keywordsQuery = searchParams.get('keywords')
 
       if (keywordsQuery) {
         setKeywords(keywordsQuery)
       }
-      if (page !== undefined && page !== 1) {
-        setCurrentPage(page)
+      if (page !== null) {
+        setCurrentPage(parseInt(page))
       }
     }, [])
 
     useEffect(() => {
-      const params = {};
+      const params: {keywords?: string, page?: number} = {};
       if (keywords.length) {
         params.keywords = keywords;
       }
       if (currentPage > 1) {
         params.page = currentPage;
       }
-      const queryString = new URLSearchParams(params).toString();
+      const queryString = new URLSearchParams(params.toString()).toString();
 
       const fetchData = async () => {
         setIsError(false);
@@ -56,7 +56,5 @@ const useFetchDataListApi = (apiEndpoint) => {
     return [
       { pageCount, dataList, keywords, currentPage, isLoading, isError },
       setKeywords, setCurrentPage
-    ];
+    ] as const;
   }
-
-  export default useFetchDataListApi;

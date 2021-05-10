@@ -1,13 +1,17 @@
-import { apiClient } from '../api.js';
+import { apiClient } from '../api';
 import { useState } from 'react';
 
-export default function LoginForm (props) {
+type Props = {
+    onLogin: () => void
+}
+
+export default function LoginForm (props: Props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [authError, setAuthError] = useState(false);
     const [unknownError, setUnknownError] = useState(false);
     const [forbiddenError, setForbiddenError] = useState(false);
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         apiClient.get('/sanctum/csrf-cookie')

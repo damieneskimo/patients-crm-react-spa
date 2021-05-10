@@ -1,4 +1,10 @@
-export default function Timeline(props) {
+import { Note } from '../types';
+
+type Props = {
+    data: Note[]
+}
+
+export default function Timeline(props: Props) {
     return (
         <div className="w-full px-20 py-8 bg-gray-200 overflow-hidden">
             <ul className="list-none">

@@ -1,18 +1,23 @@
-import { apiClient } from '../api.js';
-import { useEffect, useState } from 'react';
+import { apiClient } from '../api';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 import { useRouteMatch } from 'react-router-dom';
+import { Patient } from '../types.jsx';
 
-export default function Patient (props) {
-    const [ patient, setPatient ] = useState({...props.data, isEditing: false});
+type Props = {
+  data: Patient
+}
 
+export default function PatientListItem (props: Props) {
+    const [ patient, setPatient ] = useState<Patient>({...props.data});
+    const [ isEditing, setIsEditing ] = useState(false);
     const [ name, setName ] = useState(patient.name);
     const [ gender, setGender ] = useState(patient.gender);
     const [ mobile, setMobile ] = useState(patient.mobile);
     const [ email, setEmail ] = useState(patient.email);
 
-    let { path, url } = useRouteMatch();
+    let { url } = useRouteMatch();
   
     const editPatient = () => {
       apiClient.get('/sanctum/csrf-cookie')
@@ -20,8 +25,9 @@ export default function Patient (props) {
             apiClient.put('/api/patients/' + patient.id, {
               name, gender, mobile, email
             }).then(response => {
-              if (response.status == 200) {
-                setPatient({...response.data, isEditing: false});
+              if (response.status === 200) {
+                setPatient({...response.data});
+                setIsEditing(false);
               }
             }).catch(error => {
                 console.error(error);
@@ -29,7 +35,7 @@ export default function Patient (props) {
         });
     }
 
-    if (Object.keys(patient).length == 0) {
+    if (Object.keys(patient).length === 0) {
       return null;
     }
 
@@ -44,15 +50,17 @@ export default function Patient (props) {
           { patient.email }
         </td>
         <td className="text-center">
-          <a onClick={() => setPatient({...patient, isEditing: true})} className="py-1 px-6 rounded bg-green-400 text-lg mr-3 cursor-pointer">Edit</a>
+          <button 
+            onClick={ () => { setPatient({...patient}); setIsEditing(true); } }
+            className="py-1 px-6 rounded bg-green-400 text-lg mr-3 cursor-pointer">Edit</button>
           <Link to={`${url}/${patient.id}/notes`} className="py-1 px-6 rounded bg-green-400 text-lg">
             Notes
           </Link>
         </td>
 
         <Modal
-          isOpen={patient.isEditing}
-          onRequestClose={() => setPatient({...patient, isEditing: false})}
+          isOpen={isEditing}
+          onRequestClose={() => setIsEditing(false)}
           className="text-left z-50 overflow-auto bg-white w-1/2 px-10 py-5 inset-1/4 border-green-200 border-2 absolute"
           contentLabel="Add New Note Patient"
         >
@@ -94,7 +102,7 @@ export default function Patient (props) {
 
             <div>
               <button onClick={editPatient} className="py-3 px-5 rounded bg-green-500 text-lg right">Submit</button>
-              <button onClick={() => setPatient({...patient, isEditing: false})} className="py-3 px-5 ml-3 rounded bg-gray-200 text-lg right">Cancel</button>
+              <button onClick={() => setIsEditing(false)} className="py-3 px-5 ml-3 rounded bg-gray-200 text-lg right">Cancel</button>
             </div>
         </Modal>
       </tr>

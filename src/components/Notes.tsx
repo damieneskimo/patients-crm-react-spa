@@ -1,26 +1,27 @@
-import { apiClient } from '../api.js'
+import { apiClient } from '../api'
 import Modal from 'react-modal';
 import Timeline from './Timeline'
 import Loader from './Loader'
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import { Note } from '../types';
 
-export default function Notes(props) {
-    const [notes, setNotes] = useState([]);
+export default function Notes() {
+    const [notes, setNotes] = useState<Note[]>([]);
     const [patientName, setPatientName] = useState('');
     const [showModal, setModalStatus] = useState(false);
     const [content, setContent] = useState('');
     const [isLoading, setLoadingStatus] = useState(true);
 
-    const { patientId } = useParams();
+    const { patientId } = useParams<{patientId: string}>();
 
     useEffect(() => {
         apiClient.get('/sanctum/csrf-cookie')
             .then(() => {
                 apiClient.get('/api/patients/' + patientId + '/notes')
                     .then(response => {
-                        if (response.status == 200) {
+                        if (response.status === 200) {
                             setNotes(response.data.data);
                             setPatientName(response.data.meta.patient_name);
                             setLoadingStatus(false);
@@ -29,7 +30,7 @@ export default function Notes(props) {
                         console.error(error);
                     });
             });
-    }, [])
+    })
 
     const addNote = () => {
         apiClient.get('/sanctum/csrf-cookie')
@@ -37,7 +38,7 @@ export default function Notes(props) {
                 apiClient.post('/api/patients/' + patientId + '/notes', {
                     content: content,
                 }).then(response => {
-                    if (response.status == 201) {
+                    if (response.status === 201) {
                         notes.unshift(response.data);
                         setModalStatus(false);
                         setContent('');
@@ -83,7 +84,7 @@ export default function Notes(props) {
                         <textarea 
                             className="w-full border-2 rounded p-3 border-green-500"
                             name="content"
-                            rows="4"
+                            rows={4}
                             placeholder="Please enter the content"
                             onChange={(e) => setContent(e.target.value)}
                             value={content}

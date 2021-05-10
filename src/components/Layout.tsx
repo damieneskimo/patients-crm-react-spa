@@ -1,7 +1,12 @@
 import React from "react"
 import { NavLink } from 'react-router-dom'
 
-export default function Layout(props) {
+type Props = {
+  onLogout: () => void,
+  children: React.ReactNode
+}
+
+export default function Layout(props: Props) {
   return (
     <div className="px-40 py-5">
       <div className="flex justify-between">
