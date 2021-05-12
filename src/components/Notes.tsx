@@ -2,7 +2,7 @@ import { apiClient } from '../api'
 import Modal from 'react-modal';
 import Timeline from './Timeline'
 import Loader from './Loader'
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { Note } from '../types';
@@ -13,7 +13,7 @@ export default function Notes() {
     const [showModal, setModalStatus] = useState(false);
     const [content, setContent] = useState('');
     const [isLoading, setLoadingStatus] = useState(true);
-
+    const mountedRef = useRef(true);
     const { patientId } = useParams<{patientId: string}>();
 
     useEffect(() => {
@@ -22,14 +22,19 @@ export default function Notes() {
                 apiClient.get('/api/patients/' + patientId + '/notes')
                     .then(response => {
                         if (response.status === 200) {
+                    if (! mountedRef.current) return null;
                             setNotes(response.data.data);
                             setPatientName(response.data.meta.patient_name);
                             setLoadingStatus(false);
                         }
                     }).catch(error => {
+                if (! mountedRef.current) return null;
                         console.error(error);
                     });
-            });
+        
+        return () => {
+            mountedRef.current = false;
+        }
     })
 
     const addNote = () => {

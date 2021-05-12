@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../api'
 
 export function useFetchDataListApi<T>(apiEndpoint: string) {
@@ -8,6 +8,7 @@ export function useFetchDataListApi<T>(apiEndpoint: string) {
     const [ keywords, setKeywords ] = useState('');
     const [ isLoading, setIsLoading ] = useState(true);
     const [ isError, setIsError ] = useState(false);
+    const mountedRef = useRef(true);
 
     useEffect(() => {
       const searchParams = new URLSearchParams(window.location.search);
@@ -40,10 +41,12 @@ export function useFetchDataListApi<T>(apiEndpoint: string) {
           const result = await apiClient.get(apiEndpoint + (queryString? `?${queryString}` : ''))
 
           if (result.status === 200) {
+            if (! mountedRef.current) return null;
             setDataList(result.data.data);
             setPageCount(result.data.meta.last_page);
           }
         } catch (error) {
+          if (! mountedRef.current) return null; 
           setIsError(true);
         }
    
@@ -51,6 +54,11 @@ export function useFetchDataListApi<T>(apiEndpoint: string) {
       };
    
       fetchData();
+
+      // clean up 
+      return () => {
+        mountedRef.current = false;
+      }
     }, [currentPage, keywords]);
    
     return [
