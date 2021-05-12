@@ -35,21 +35,18 @@ export default function PatientsList() {
     );
 
     const addNewPatient = () => {
-        apiClient.get('/sanctum/csrf-cookie')
-          .then(() => {
-              apiClient.post('/api/patients/', newPatient).then(response => {
-                if (response.status === 201) {
-                  dataList.unshift(response.data);
-                  setModalStatus(false);
-                  // reset patient state
-                  setNewPatient({
-                    name: '', email: '', gender: '', mobile: ''
-                  })
-                }
-              }).catch(error => {
-                  console.error(error);
-              });
-          });
+      apiClient.post('/api/patients/', newPatient).then(response => {
+        if (response.status === 201) {
+          dataList.unshift(response.data);
+          setModalStatus(false);
+          // reset patient state
+          setNewPatient({
+            name: '', email: '', gender: '', mobile: ''
+          })
+        }
+      }).catch(error => {
+          console.error(error);
+      });
     }
 
     const handlePageClick = (selectedItem: {selected: number}) => {

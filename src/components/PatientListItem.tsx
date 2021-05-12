@@ -20,19 +20,16 @@ export default function PatientListItem (props: Props) {
     let { url } = useRouteMatch();
   
     const editPatient = () => {
-      apiClient.get('/sanctum/csrf-cookie')
-        .then(() => {
-            apiClient.put('/api/patients/' + patient.id, {
-              name, gender, mobile, email
-            }).then(response => {
-              if (response.status === 200) {
-                setPatient({...response.data});
-                setIsEditing(false);
-              }
-            }).catch(error => {
-                console.error(error);
-            });
-        });
+      apiClient.put('/api/patients/' + patient.id, {
+        name, gender, mobile, email
+      }).then(response => {
+        if (response.status === 200) {
+          setPatient({...response.data});
+          setIsEditing(false);
+        }
+      }).catch(error => {
+          console.error(error);
+      });
     }
 
     if (Object.keys(patient).length === 0) {

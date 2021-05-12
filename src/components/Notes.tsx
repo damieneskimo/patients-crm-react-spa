@@ -17,20 +17,18 @@ export default function Notes() {
     const { patientId } = useParams<{patientId: string}>();
 
     useEffect(() => {
-        apiClient.get('/sanctum/csrf-cookie')
-            .then(() => {
-                apiClient.get('/api/patients/' + patientId + '/notes')
-                    .then(response => {
-                        if (response.status === 200) {
+        apiClient.get('/api/patients/' + patientId + '/notes')
+            .then(response => {
+                if (response.status === 200) {
                     if (! mountedRef.current) return null;
-                            setNotes(response.data.data);
-                            setPatientName(response.data.meta.patient_name);
-                            setLoadingStatus(false);
-                        }
-                    }).catch(error => {
+                    setNotes(response.data.data);
+                    setPatientName(response.data.meta.patient_name);
+                    setLoadingStatus(false);
+                }
+            }).catch(error => {
                 if (! mountedRef.current) return null;
-                        console.error(error);
-                    });
+                console.error(error);
+            });
         
         return () => {
             mountedRef.current = false;
@@ -38,20 +36,17 @@ export default function Notes() {
     })
 
     const addNote = () => {
-        apiClient.get('/sanctum/csrf-cookie')
-            .then(() => {
-                apiClient.post('/api/patients/' + patientId + '/notes', {
-                    content: content,
-                }).then(response => {
-                    if (response.status === 201) {
-                        notes.unshift(response.data);
-                        setModalStatus(false);
-                        setContent('');
-                    }
-                }).catch(error => {
-                    console.error(error);
-                });
-            });
+        apiClient.post('/api/patients/' + patientId + '/notes', {
+            content: content,
+        }).then(response => {
+            if (response.status === 201) {
+                notes.unshift(response.data);
+                setModalStatus(false);
+                setContent('');
+            }
+        }).catch(error => {
+            console.error(error);
+        });
     }
 
     if (isLoading) {
