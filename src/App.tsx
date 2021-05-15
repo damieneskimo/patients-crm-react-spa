@@ -8,41 +8,21 @@ import {
   Switch
 } from "react-router-dom";
 import { useState } from 'react';
-import { apiClient } from './api';
-import Modal from 'react-modal';
 import Layout from './components/Layout';
-
-Modal.setAppElement('#root');
 
 function App() {
   const [isLoggedin, setLoginStatus] = useState(() => {
     return (typeof window !== 'undefined' && sessionStorage.getItem('loggedIn') === 'true') || false
   });
 
-  const login = () => {
-    setLoginStatus(true);
-    sessionStorage.setItem('loggedIn', 'true');
-  }
-
-  const logout = () => {
-    apiClient.post('/logout').then(response => {
-        if (response.status === 204) {
-          setLoginStatus(false);
-          sessionStorage.setItem('loggedIn', 'false');
-        }
-      }).catch(error => {
-          console.error(error);
-      });
-  }
-
   return (
     <Router>
         <Switch>
           <Route path="/login">
-            {isLoggedin? <Redirect to='/patients' /> : <LoginForm onLogin={login} />}
+            {isLoggedin? <Redirect to='/patients' /> : <LoginForm onSetLoginStatus={setLoginStatus} />}
           </Route>
 
-          <Layout onLogout={logout}>
+          <Layout onSetLoginStatus={setLoginStatus}>
             <Route exact path="/">
               {isLoggedin? <Redirect to='/patients' /> : <Redirect to='/login' />}
             </Route>

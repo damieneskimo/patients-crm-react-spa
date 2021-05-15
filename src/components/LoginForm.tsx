@@ -2,7 +2,7 @@ import { apiClient } from '../api';
 import { useState } from 'react';
 
 type Props = {
-    onLogin: () => void
+    onSetLoginStatus: (status: boolean) => void
 }
 
 export default function LoginForm (props: Props) {
@@ -11,9 +11,12 @@ export default function LoginForm (props: Props) {
     const [authError, setAuthError] = useState(false);
     const [unknownError, setUnknownError] = useState(false);
     const [forbiddenError, setForbiddenError] = useState(false);
+    const [btnDisabled, setBtnDisabled] = useState(false);
     
-    const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
+    const handleSubmit = () => {
+        // e.preventDefault();
+        
+        setBtnDisabled(true);
 
         apiClient.get('/sanctum/csrf-cookie')
             .then(() => {
@@ -22,7 +25,8 @@ export default function LoginForm (props: Props) {
                     password: password
                 }).then(response => {
                     if (response.status === 204) {
-                        props.onLogin();
+                        props.onSetLoginStatus(true);
+                        sessionStorage.setItem('loggedIn', 'true');
                     }
                 }).catch(error => {
                     if (error.response && error.response.status === 422) {
@@ -33,13 +37,14 @@ export default function LoginForm (props: Props) {
                         setUnknownError(true);
                         console.error(error);
                     }
+                    setBtnDisabled(false)
                 });
             });
     }
 
     return (
         <div className="min-h-screen flex justify-center items-center text-center">
-            <form className="w-1/3">
+            <form className="w-1/3" onSubmit={handleSubmit} aria-label="form">
                 <h3 className="text-2xl">Patients CRM Login</h3>
                 <div className="py-5">
                     <input
@@ -72,7 +77,11 @@ export default function LoginForm (props: Props) {
                     <p className="text-red-400 p-3">There was an error submitting your details.</p>
                 }
 
-                <button onClick={handleSubmit} className="py-4 px-8 rounded bg-green-500 text-lg">Login</button>  
+                <button 
+                    type="submit"
+                    className="py-4 px-8 rounded bg-green-500 text-lg"
+                    disabled={btnDisabled}
+                    >Login</button>
             </form>
         </div>
     )
