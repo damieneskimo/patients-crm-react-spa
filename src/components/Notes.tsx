@@ -3,26 +3,30 @@ import Modal from 'react-modal';
 import Timeline from './Timeline'
 import Loader from './Loader'
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { Note } from '../types';
 
+type LocationState = {
+    patientName: string
+}
+
 export default function Notes() {
     const [notes, setNotes] = useState<Note[]>([]);
-    const [patientName, setPatientName] = useState('');
     const [showModal, setModalStatus] = useState(false);
     const [content, setContent] = useState('');
     const [isLoading, setLoadingStatus] = useState(true);
     const mountedRef = useRef(true);
     const { patientId } = useParams<{patientId: string}>();
-
+    const location = useLocation();
+    const locationState = location.state as LocationState;
+    
     useEffect(() => {
         apiClient.get('/api/patients/' + patientId + '/notes')
             .then(response => {
                 if (response.status === 200) {
                     if (! mountedRef.current) return null;
                     setNotes(response.data.data);
-                    setPatientName(response.data.meta.patient_name);
                     setLoadingStatus(false);
                 }
             }).catch(error => {
@@ -58,7 +62,7 @@ export default function Notes() {
             <h1 className="text-2xl text-left">
                 Notes for
                 <Link to='/patients' className="text-green-500">
-                     { ' ' + patientName }
+                     { ' ' + locationState.patientName }
                 </Link>
             </h1>
             <button onClick={() => setModalStatus(true)} className="py-2 px-4 rounded bg-green-500 text-lg mt-3 float-left">Add New Note</button>
@@ -68,7 +72,7 @@ export default function Notes() {
                     <Timeline data={notes} />
                 }
                 {! isLoading && notes.length === 0 &&
-                    <p>No notes found for { patientName }</p>
+                    <p>No notes found for { locationState.patientName }</p>
                 }
             </div>
 
@@ -78,7 +82,7 @@ export default function Notes() {
                 className="text-left z-50 overflow-auto bg-white w-1/2 px-10 py-5 inset-1/4 border-green-200 border-2 absolute"
                 contentLabel="Add New Note Modal"
             >
-                <h3 className="text-xl">Add New Note for { patientName }</h3>
+                <h3 className="text-xl">Add New Note for { locationState.patientName }</h3>
                 <form>
                     <div className="my-5">
                         <textarea 

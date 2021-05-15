@@ -50,7 +50,8 @@ export default function PatientListItem (props: Props) {
           <button 
             onClick={ () => { setPatient({...patient}); setIsEditing(true); } }
             className="py-1 px-6 rounded bg-green-400 text-lg mr-3 cursor-pointer">Edit</button>
-          <Link to={`${url}/${patient.id}/notes`} className="py-1 px-6 rounded bg-green-400 text-lg">
+          <Link to={{pathname: `${url}/${patient.id}/notes`, state: {patientName: name}}} 
+            className="py-1 px-6 rounded bg-green-400 text-lg">
             Notes
           </Link>
         </td>
