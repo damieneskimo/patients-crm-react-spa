@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Modal from 'react-modal';
+
+// mount Modal component onto root element, so it's available to app
+Modal.setAppElement('#root');
 
 if (process.env.NODE_ENV === 'development') {
   const { worker } = require('./mocks/browser')
