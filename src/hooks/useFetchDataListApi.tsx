@@ -23,15 +23,16 @@ export function useFetchDataListApi<T>(apiEndpoint: string, mountedRef: MutableR
     }, [])
 
     useEffect(() => {
-      const params: {keywords?: string, page?: number} = {};
+      const params = new URLSearchParams();
       if (keywords.length) {
-        params.keywords = keywords;
+        params.set('keywords', keywords);
       }
       if (currentPage > 1) {
-        params.page = currentPage;
+        params.set('page', currentPage.toString());
       }
-      const queryString = new URLSearchParams(params.toString()).toString();
-
+      
+      const queryString = params.toString();
+      
       const fetchData = async () => {
         setIsError(false);
         setIsLoading(true);
