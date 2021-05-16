@@ -79,6 +79,7 @@ export default function LoginForm (props: Props) {
 
                 <button 
                     type="submit"
+                    onClick={handleSubmit}
                     className="py-4 px-8 rounded bg-green-500 text-lg"
                     disabled={btnDisabled}
                     >Login</button>

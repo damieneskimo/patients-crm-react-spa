@@ -2,10 +2,11 @@ import { apiClient } from '../api'
 import Modal from 'react-modal';
 import Timeline from './Timeline'
 import Loader from './Loader'
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { Note } from '../types';
+import { useMountedRef } from '../hooks/useMountedRef';
 
 type LocationState = {
     patientName: string
@@ -16,7 +17,7 @@ export default function Notes() {
     const [showModal, setModalStatus] = useState(false);
     const [content, setContent] = useState('');
     const [isLoading, setLoadingStatus] = useState(true);
-    const mountedRef = useRef(true);
+    const mountedRef = useMountedRef();
     const { patientId } = useParams<{patientId: string}>();
     const location = useLocation();
     const locationState = location.state as LocationState;
@@ -33,10 +34,6 @@ export default function Notes() {
                 if (! mountedRef.current) return null;
                 console.error(error);
             });
-        
-        return () => {
-            mountedRef.current = false;
-        }
     })
 
     const addNote = () => {

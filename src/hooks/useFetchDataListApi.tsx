@@ -1,14 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, MutableRefObject } from 'react';
 import { apiClient } from '../api'
 
-export function useFetchDataListApi<T>(apiEndpoint: string) {
+export function useFetchDataListApi<T>(apiEndpoint: string, mountedRef: MutableRefObject<boolean>) {
     const [ pageCount, setPageCount ] = useState(1);
     const [ currentPage, setCurrentPage ] = useState(1);
     const [ dataList, setDataList ] = useState<T[]>([]);
     const [ keywords, setKeywords ] = useState('');
     const [ isLoading, setIsLoading ] = useState(true);
     const [ isError, setIsError ] = useState(false);
-    const mountedRef = useRef(true);
 
     useEffect(() => {
       const searchParams = new URLSearchParams(window.location.search);
@@ -54,11 +53,6 @@ export function useFetchDataListApi<T>(apiEndpoint: string) {
       };
    
       fetchData();
-
-      // clean up 
-      return () => {
-        mountedRef.current = false;
-      }
     }, [currentPage, keywords]);
    
     return [
