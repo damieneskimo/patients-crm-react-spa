@@ -11,7 +11,7 @@ import { Patient } from '../types';
 
 export default function PatientsList() {
     const [ newPatient, setNewPatient ] = useState({
-      name: '', email: '', gender: '', mobile: ''
+      name: '', email: '', gender: '', mobile: '', profile_photo: ''
     });
     const [ showModal, setModalStatus ] = useState(false);
     const mountedRef = useMountedRef();
@@ -43,7 +43,7 @@ export default function PatientsList() {
           setModalStatus(false);
           // reset patient state
           setNewPatient({
-            name: '', email: '', gender: '', mobile: ''
+            name: '', email: '', gender: '', mobile: '', profile_photo: ''
           })
         }
       }).catch(error => {
@@ -77,6 +77,7 @@ export default function PatientsList() {
         <table className="mt-3 mx-auto w-full table-auto">
           <thead>
             <tr className="border-b border-green-500 pb-3">
+              <th className="py-3"></th>
               <th className="text-left py-3 text-lg">Name</th>
               <th className="text-left text-lg">Gender</th>
               <th className="text-left text-lg">Mobile</th>
@@ -152,6 +153,16 @@ export default function PatientsList() {
                     placeholder="Mobile"
                     onChange={(e) => setNewPatient({...newPatient, mobile: e.target.value})}
                     value={newPatient.mobile}
+                />
+              </div>
+              <div className="my-5">
+                <input
+                    type="file"
+                    className="w-full border-2 rounded p-3 border-green-500"
+                    name="profile_photo"
+                    placeholder="Upload a profile photo"
+                    onChange={(e) => setNewPatient({...newPatient, profile_photo: e.target.value})}
+                    value={newPatient.profile_photo}
                 />
               </div>
             </form>

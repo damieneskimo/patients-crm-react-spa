@@ -4,6 +4,7 @@ export type Patient = {
     gender: string;
     email: string;
     mobile: string;
+    profile_photo: string;
 }
 
 export type Note = {

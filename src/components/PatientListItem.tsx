@@ -1,5 +1,5 @@
 import { apiClient } from '../api';
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 import { useRouteMatch } from 'react-router-dom';
@@ -12,17 +12,27 @@ type Props = {
 export default function PatientListItem (props: Props) {
     const [ patient, setPatient ] = useState<Patient>({...props.data});
     const [ isEditing, setIsEditing ] = useState(false);
-    const [ name, setName ] = useState(patient.name);
-    const [ gender, setGender ] = useState(patient.gender);
-    const [ mobile, setMobile ] = useState(patient.mobile);
-    const [ email, setEmail ] = useState(patient.email);
-
+    const [ newPatient, setNewPatient ] = useState({name: patient.name, gender: patient.gender, mobile: patient.mobile, email: patient.email});
+    
     let { url } = useRouteMatch();
-  
+
     const editPatient = () => {
-      apiClient.put('/api/patients/' + patient.id, {
-        name, gender, mobile, email
-      }).then(response => {
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(newPatient)) {
+        formData.append(key, value);
+      }
+      formData.append('_method', 'put')
+      const file = document.getElementById('profile_photo') as HTMLInputElement;
+      formData.append('profile_photo', file!.files![0], file!.files![0].name)
+
+      apiClient(
+        {
+          method: 'post',
+          url: '/api/patients/' + patient.id,
+          headers: { 'content-type': 'multipart/form-data' },
+          data: formData,
+        }
+      ).then(response => {
         if (response.status === 200) {
           setPatient({...response.data});
           setIsEditing(false);
@@ -38,6 +48,7 @@ export default function PatientListItem (props: Props) {
 
     return (
       <tr>
+        <td><img src={ patient.profile_photo } alt="profile" className="h-16" /></td>
         <td className="py-3">{ patient.name }</td>
         <td>{ patient.gender }</td>
         <td>
@@ -50,7 +61,7 @@ export default function PatientListItem (props: Props) {
           <button 
             onClick={ () => { setPatient({...patient}); setIsEditing(true); } }
             className="py-1 px-6 rounded bg-green-400 text-lg mr-3 cursor-pointer">Edit</button>
-          <Link to={{pathname: `${url}/${patient.id}/notes`, state: {patientName: name}}} 
+          <Link to={{pathname: `${url}/${patient.id}/notes`, state: {patientName: patient.name}}} 
             className="py-1 px-6 rounded bg-green-400 text-lg inline-block">
             Notes
           </Link>
@@ -64,17 +75,29 @@ export default function PatientListItem (props: Props) {
         >
             <h3>Edit { patient.name }</h3>
             <form>
+              <div className="my-5 flex">
+                <img src={patient.profile_photo} alt="profile" className="h-32" />
+                <div className="w-full pl-3">
+                  <p className="mb-3">Update profile photo</p>
+                  <input
+                    type="file"
+                    className="w-full border-2 rounded p-3 border-green-500"
+                    name="profile_photo"
+                    id="profile_photo"
+                  />
+                </div>
+              </div>
               <div className="my-5">
                 <input
                   className="w-full border-2 rounded p-3 border-green-500"
                   name="name"
-                  onChange={ (e) => setName(e.target.value) }
-                  value={name}
+                  onChange={ (e) => setNewPatient({...newPatient, name: e.target.value}) }
+                  value={newPatient.name}
                   required
                   />
               </div>
               <div className="my-5">
-                <select onChange={ (e) => setGender(e.target.value) } value={gender} className="w-full border-2 rounded p-3 border-green-500">
+                <select onChange={ (e) => setNewPatient({...newPatient, gender: e.target.value}) } value={newPatient.gender} className="w-full border-2 rounded p-3 border-green-500">
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="rather not say">Rather Not Say</option>
@@ -84,16 +107,16 @@ export default function PatientListItem (props: Props) {
                 <input
                     className="w-full border-2 rounded p-3 border-green-500"
                     name="mobile"
-                    onChange={ (e) => setMobile(e.target.value) }
-                    value={mobile}
+                    onChange={ (e) => setNewPatient({...newPatient, mobile: e.target.value}) }
+                    value={newPatient.mobile}
                 />
               </div>
               <div className="my-5">
                 <input
                     className="w-full border-2 rounded p-3 border-green-500"
                     name="email"
-                    onChange={ (e) => setEmail(e.target.value) }
-                    value={email}
+                    onChange={ (e) => setNewPatient({...newPatient, email: e.target.value}) }
+                    value={newPatient.email}
                 />
               </div>
             </form>
