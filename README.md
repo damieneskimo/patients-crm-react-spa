@@ -1,17 +1,21 @@
 # Patient CRM (Vue SPA)
 
-This project is a React Single Page Application (SPA) for managing patients data was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). It will retrieve the data from API in the project: https://github.com/damieneskimo/patients-crm. <br />
+This project is a React Single Page Application (SPA) for managing patients data and was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). 
 
-It uses Axios as the http client, React Router for the routing and Tailwind CSS for styling. <br />
+<br />
+For a quick overview and easier development without being tied up with a back end, this project uses [Mock Service Worker] (https://github.com/mswjs/msw) to mock rest api and [faker.js] (https://github.com/Marak/faker.js) to generate fake data.
+
+<br />
+To use a real backend API service, please check the sibling Laravel project: https://github.com/damieneskimo/patients-crm. And before run `yarn start`, please uncomment `REACT_APP_API_BASE_URL=http://localhost:8000` in the `.env` file to initilise the backend api url.
+
+<br />
+This project also uses TypeScript for type checking, Axios as the http client, React Router for the routing and Tailwind CSS for styling. 
+
+<br />
 
 > Note: If you are using a different domain and port for the backend, please change it accordingly in api.js file
 
 <br />
-
-# Todos:
-
-- [ ] add api request for searching keywords on Patiets List
-- [ ] add unit test
 
 ## Available Scripts
 
