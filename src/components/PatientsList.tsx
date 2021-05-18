@@ -11,7 +11,7 @@ import { Patient } from '../types';
 
 export default function PatientsList() {
     const [ newPatient, setNewPatient ] = useState({
-      name: '', email: '', gender: '', mobile: '', profile_photo: ''
+      name: '', email: '', gender: '', mobile: ''
     });
     const [ showModal, setModalStatus ] = useState(false);
     const mountedRef = useMountedRef();
@@ -37,13 +37,24 @@ export default function PatientsList() {
     );
 
     const addNewPatient = () => {
-      apiClient.post('/api/patients/', newPatient).then(response => {
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(newPatient)) {
+        formData.append(key, value);
+      }
+      const file = document.getElementById('profile_photo') as HTMLInputElement;
+      formData.append('profile_photo', file!.files![0], file!.files![0].name)
+
+      apiClient.post(
+        '/api/patients/',
+        formData,
+        { headers: {'content-type': 'multipart/form-data'} }
+      ).then(response => {
         if (response.status === 201) {
           dataList.unshift(response.data);
           setModalStatus(false);
           // reset patient state
           setNewPatient({
-            name: '', email: '', gender: '', mobile: '', profile_photo: ''
+            name: '', email: '', gender: '', mobile: ''
           })
         }
       }).catch(error => {
@@ -160,9 +171,7 @@ export default function PatientsList() {
                     type="file"
                     className="w-full border-2 rounded p-3 border-green-500"
                     name="profile_photo"
-                    placeholder="Upload a profile photo"
-                    onChange={(e) => setNewPatient({...newPatient, profile_photo: e.target.value})}
-                    value={newPatient.profile_photo}
+                    id="profile_photo"
                 />
               </div>
             </form>
