@@ -57,11 +57,20 @@ export const handlers = [
         let start = 0 + 15 * (page - 1);
         let end = 14 + 15 * (page - 1);
         
-        // const keywords = req.url.searchParams.get('keywords')
+        let data = fakePatients.slice(start, end);
+        const keywords = req.url.searchParams.get('keywords');
+        if (keywords !== null) {
+            data = data.filter(item => {
+                let nameEmail = (item.name + ' ' + item.email).toLowerCase();
+
+                return nameEmail.includes(keywords)
+            })
+        }
+
         return res(
             ctx.status(200),
             ctx.json({
-                "data": fakePatients.slice(start, end),
+                "data": data,
                 "meta": {
                     currentPage: page? parseInt(page) : 1,
                     last_page: Math.ceil(numOfPatients/15)
