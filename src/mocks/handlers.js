@@ -12,7 +12,8 @@ for (let index = 1; index <= numOfPatients; index++) {
         gender: Faker.random.arrayElement([
             'male', 'female', 'rather not say'
         ]),
-        mobile: Faker.phone.phoneNumber()
+        mobile: Faker.phone.phoneNumber(),
+        profile_photo: Faker.image.avatar()
     })
 
     fakeNotes[index] = [];
