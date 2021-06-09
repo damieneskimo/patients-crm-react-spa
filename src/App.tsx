@@ -1,6 +1,7 @@
-import Notes from './components/Notes';
-import LoginForm from './components/LoginForm';
-import PatientsList from './components/PatientsList';
+import Notes from './pages/notes';
+import LoginForm from './pages/login';
+import PatientsList from './pages/patients-list';
+import Layout from './components/Layout';
 import {
   BrowserRouter as Router,
   Route,
@@ -8,7 +9,7 @@ import {
   Switch
 } from "react-router-dom";
 import { useState } from 'react';
-import Layout from './components/Layout';
+import Login from './pages/login';
 
 function App() {
   const [isLoggedin, setLoginStatus] = useState(() => {
@@ -16,6 +17,8 @@ function App() {
   });
 
   return (
+      // {isLoggedin ? <Authenticated /> : <Login />}
+    
     <Router>
         <Switch>
           <Route path="/login">

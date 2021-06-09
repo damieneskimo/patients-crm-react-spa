@@ -1,13 +1,13 @@
-import PatientListItem from './PatientListItem'
-import { apiClient } from '../api';
+import PatientListItem from '../../components/PatientListItem'
+import { apiClient } from '../../api';
 import { useRef, useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import Loader from './Loader';
+import Loader from '../../components/Loader';
 import ReactPaginate from 'react-paginate';
-import { useFetchDataListApi } from '../hooks/useFetchDataListApi';
-import { useMountedRef } from '../hooks/useMountedRef';
+import { useFetchDataListApi } from '../../hooks/useFetchDataListApi';
+import { useMountedRef } from '../../hooks/useMountedRef';
 import { useDebouncedCallback } from 'use-debounce';
-import { Patient } from '../types';
+import { Patient } from '../../types';
 
 export default function PatientsList() {
     const [ newPatient, setNewPatient ] = useState({

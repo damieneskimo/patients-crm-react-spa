@@ -1,4 +1,4 @@
-export type Patient = {
+export interface Patient {
     id: number;
     name: string;
     gender: string;
@@ -7,7 +7,7 @@ export type Patient = {
     profile_photo: string;
 }
 
-export type Note = {
+export interface Note {
     id: number,
     content: string,
     created_at: string

@@ -1,11 +1,11 @@
-import { apiClient } from '../api';
+import { apiClient } from '../../api';
 import { useState } from 'react';
 
 type Props = {
     onSetLoginStatus: (status: boolean) => void
 }
 
-export default function LoginForm (props: Props) {
+export default function Login (props: Props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [authError, setAuthError] = useState(false);

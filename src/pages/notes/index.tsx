@@ -1,12 +1,12 @@
-import { apiClient } from '../api'
+import { apiClient } from '../../api'
 import Modal from 'react-modal';
-import Timeline from './Timeline'
-import Loader from './Loader'
+import Timeline from '../../components/Timeline'
+import Loader from '../../components/Loader'
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import { Note } from '../types';
-import { useMountedRef } from '../hooks/useMountedRef';
+import { Note } from '../../types';
+import { useMountedRef } from '../../hooks/useMountedRef';
 
 type LocationState = {
     patientName: string

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '../pages/login';
 import App from '../App';
 import userEvent from '@testing-library/user-event';
 import { apiClient } from '../api';
@@ -9,7 +9,6 @@ const spy = jest.spyOn(apiClient, 'post');
 describe('LoginForm component', () => {
   beforeEach(() => {
     render(<LoginForm onSetLoginStatus={jest.fn} />);
-    window._virtualConsole!.emit = jest.fn();
   })
   
   afterAll(() => {
