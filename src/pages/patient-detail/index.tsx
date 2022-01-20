@@ -1,53 +1,49 @@
-import { apiClient } from '../../api'
 import Modal from 'react-modal';
 import Timeline from '../../components/Timeline'
 import Loader from '../../components/Loader'
-import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link} from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import { Note } from '../../types';
-import { useMountedRef } from '../../hooks/useMountedRef';
+import noteService from '../../services/note';
+import patientService from '../../services/patient';
+import { useAsync } from '../../utils/useAsync';
 
-type LocationState = {
-    patientName: string
-}
-
-export default function Notes() {
-    const [notes, setNotes] = useState<Note[]>([]);
+export default function PatientDetail() {
     const [showModal, setModalStatus] = useState(false);
     const [content, setContent] = useState('');
-    const [isLoading, setLoadingStatus] = useState(true);
-    const mountedRef = useMountedRef();
-    const { patientId } = useParams<{patientId: string}>();
-    const location = useLocation();
-    const locationState = location.state as LocationState;
-    
-    useEffect(() => {
-        apiClient.get('/api/patients/' + patientId + '/notes')
-            .then(response => {
-                if (response.status === 200) {
-                    if (! mountedRef.current) return null;
-                    setNotes(response.data.data);
-                    setLoadingStatus(false);
-                }
-            }).catch(error => {
-                if (! mountedRef.current) return null;
-                console.error(error);
-            });
-    })
+    const { patientId } = useParams();
 
-    const addNote = () => {
-        apiClient.post('/api/patients/' + patientId + '/notes', {
-            content: content,
-        }).then(response => {
-            if (response.status === 201) {
-                notes.unshift(response.data);
-                setModalStatus(false);
-                setContent('');
-            }
-        }).catch(error => {
-            console.error(error);
-        });
+    const getPatient = async () => {
+      if (patientId === undefined) {
+        throw new Error("Cannot find patient");
+      }
+      const patient = await patientService.getPatient(parseInt(patientId))
+      return patient;
+    }
+
+    const getNotes = async () => {
+      if (patientId === undefined) {
+        throw new Error("Cannot find patient");
+      }
+      const notes = await noteService.getAllNotes(parseInt(patientId))
+      return notes;
+    }
+
+    const [{ data: patient }] = useAsync(getPatient, [patientId])
+    const [{ isLoading, data: notes }, setState] = useAsync(getNotes, [patientId])
+
+    const addNote = async () => {
+      if (patientId === undefined) {
+        throw new Error("Cannot find patient");
+      }
+
+      const res = await noteService.addNote(parseInt(patientId), { data: content })
+      const notesList = [...notes];
+      notesList.unshift(res);
+      setState((prevState) => ({ ...prevState, data: notesList }))
+
+      setModalStatus(false);
+      setContent('');
     }
 
     if (isLoading) {
@@ -59,7 +55,7 @@ export default function Notes() {
             <h1 className="text-2xl text-left">
                 Notes for
                 <Link to='/patients' className="text-green-500">
-                     { ' ' + locationState.patientName }
+                     { ' ' + patient.name }
                 </Link>
             </h1>
             <button onClick={() => setModalStatus(true)} className="py-2 px-4 rounded bg-green-500 text-lg mt-3 float-left">Add New Note</button>
@@ -69,7 +65,7 @@ export default function Notes() {
                     <Timeline data={notes} />
                 }
                 {! isLoading && notes.length === 0 &&
-                    <p>No notes found for { locationState.patientName }</p>
+                    <p>No notes found</p>
                 }
             </div>
 
@@ -79,7 +75,7 @@ export default function Notes() {
                 className="text-left z-50 overflow-auto bg-white w-1/2 px-10 py-5 inset-1/4 border-green-200 border-2 absolute"
                 contentLabel="Add New Note Modal"
             >
-                <h3 className="text-xl">Add New Note for { locationState.patientName }</h3>
+                <h3 className="text-xl">Add New Note for</h3>
                 <form>
                     <div className="my-5">
                         <textarea 
@@ -96,7 +92,7 @@ export default function Notes() {
                 </form>
 
                 <div>
-                    <button onClick={addNote} className="py-3 px-5 rounded bg-green-500 text-lg right">Submit</button>
+                    <button onClick={addNote} className="py-3 px-5 rounded bg-green-500 text-lg right">Save</button>
                     <button onClick={() => setModalStatus(false)} className="py-3 px-5 ml-3 rounded bg-gray-200 text-lg right">Cancel</button>
                 </div>
             </Modal>

@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Modal from 'react-modal';
+import AppProviders from './contexts';
 
 // mount Modal component onto root element, so it's available to app
 Modal.setAppElement('#root');
@@ -15,7 +16,9 @@ if (process.env.NODE_ENV === 'development') {
 
 ReactDOM.render(
   <React.StrictMode>
+    <AppProviders>
       <App />
+    </AppProviders>
   </React.StrictMode>,
   document.getElementById('root')
 );

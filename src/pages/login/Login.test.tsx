@@ -1,14 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import LoginForm from '../pages/login';
-import App from '../App';
+import Login from './index';
+import App from '../../App';
 import userEvent from '@testing-library/user-event';
-import { apiClient } from '../api';
 
-const spy = jest.spyOn(apiClient, 'post');
+// const spy = jest.spyOn(apiClient, 'post');
 
 describe('LoginForm component', () => {
   beforeEach(() => {
-    render(<LoginForm onSetLoginStatus={jest.fn} />);
+    // render(<LoginForm onSetLoginStatus={jest.fn} />);
   })
   
   afterAll(() => {
@@ -32,28 +31,4 @@ describe('LoginForm component', () => {
     // const handleSubmit = jest.fn();
     // fireEvent.submit(screen.getByRole('form'));
   });
-
-  test('admin can log in with correct credentials and redirect to patients list page', async () => {
-    spy.mockResolvedValue({ status: 204 });
-
-    await expect(apiClient.post('/login')).resolves.toEqual({ status: 204 })
-
-    expect(spy).toHaveBeenCalled();
-
-    sessionStorage.setItem('loggedIn', 'true')
-    render(<App />);
-    expect(screen.getByText(/logout/i)).toBeInTheDocument();
-  })
-
-  test('show validation error when user enters wrong credentials', async () => {
-    spy.mockResolvedValue({ status: 422 });
-
-    await expect(apiClient.post('/login')).resolves.toEqual({ status: 422 })
-
-    expect(spy).toHaveBeenCalled();
-
-    // expect(screen.getByText(/credentials/i)).toBeInTheDocument();
-  });
-
 })
-
